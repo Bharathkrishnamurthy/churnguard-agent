@@ -82,6 +82,7 @@ PAGE = """<!doctype html>
   .muted { color: var(--muted); }
   .subject { max-width: 240px; overflow-wrap: anywhere; }
   .reason { max-width: 260px; color: #c7d2ea; line-height: 1.45; }
+  .explain { margin-top: 8px; font-size: 12px; color: var(--muted); line-height: 1.45; }
   .badge, .pill {
     display: inline-block;
     padding: 4px 11px;
@@ -149,6 +150,7 @@ PAGE = """<!doctype html>
   </section>
   <footer>
     Only the sandbox buyer account triggers a PayPal call. Other rows are demo subscribers and are logged only.
+    Explanations are one-sentence summaries written by a language model; the decisions come from fixed rules.
     Offers are unpaid sandbox orders; the approval page is the evidence of the offer.
   </footer>
 </main>
@@ -195,6 +197,10 @@ def build_row(r):
     if r.get("approve_url"):
         link = f'<br><a class="btn" href="{esc(r["approve_url"])}" target="_blank" rel="noopener">Open offer</a>'
 
+    explanation = ""
+    if r.get("explanation"):
+        explanation = f'<div class="explain">{esc(r["explanation"])}</div>'
+
     return (
         "<tr>"
         f'<td class="mono">{esc(r.get("time"))}</td>'
@@ -202,7 +208,7 @@ def build_row(r):
         f"<td>{risk_cell(r.get('risk_score'))}</td>"
         f'<td class="mono">{esc(r.get("failed_payments"))}</td>'
         f'<td><span class="{badge_cls}">{esc(badge_label)}</span></td>'
-        f'<td class="reason">{esc(r.get("reason"))}</td>'
+        f'<td class="reason">{esc(r.get("reason"))}{explanation}</td>'
         f'<td><span class="{pill_cls}">{esc(pill_label)}</span></td>'
         f'<td class="mono">{order_cell}</td>'
         f"<td>{amount_text}{link}</td>"
