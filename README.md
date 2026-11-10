@@ -4,8 +4,6 @@ A rule-based retention agent for PayPal subscriptions. It scores subscribers wit
 
 ## Quick view (no credentials needed)
 
-    pip install -r requirements.txt
-    set DECISIONS_PATH=samples/decisions.jsonl
     python src/dashboard.py
 
 Open http://127.0.0.1:5001. The page shows the sample decision log. The hosted demo is at https://churnguard-agent.onrender.com.
