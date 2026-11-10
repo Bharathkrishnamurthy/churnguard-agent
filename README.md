@@ -3,9 +3,6 @@
 A rule-based retention agent for PayPal subscriptions. It scores subscribers with a churn model, chooses one action from fixed rules, creates a discounted PayPal sandbox order for the highest-risk case, and logs every decision. Each decision has a one-sentence explanation from a language model, with a rule-based fallback.
 
 ## Quick view (no credentials needed)
-
-    python src/dashboard.py
-
 Open http://127.0.0.1:5001. The page shows the sample decision log. The hosted demo is at https://churnguard-agent.onrender.com.
 
 ## Full run (needs PayPal sandbox and Gemini keys)
@@ -29,3 +26,4 @@ PayPal sandbox (Orders API, Subscriptions, webhooks), scikit-learn (Random Fores
 ## Licence
 
 MIT. See LICENSE.
+
