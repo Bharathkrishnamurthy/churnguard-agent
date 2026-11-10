@@ -1,6 +1,7 @@
 ﻿import csv
 import json
 import os
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -9,27 +10,12 @@ from paypal_client import api
 
 DATA = Path("data")
 DATA.mkdir(exist_ok=True)
-DEMO = DATA / "subscribers_demo.csv"
+SCORED = DATA / "scored_subscribers.csv"
 DECISIONS = DATA / "decisions.jsonl"
 
 BUYER = os.environ.get("SANDBOX_BUYER_EMAIL", "")
 OFFER_DISCOUNT = 0.20
-
-DEMO_ROWS = [
-    {"email": BUYER, "risk_score": "0.82", "failed_payments": "2", "outstanding_amount": "10.00"},
-    {"email": "demo-subscriber-2@example.com", "risk_score": "0.74", "failed_payments": "0", "outstanding_amount": "10.00"},
-    {"email": "demo-subscriber-3@example.com", "risk_score": "0.55", "failed_payments": "0", "outstanding_amount": "10.00"},
-    {"email": "demo-subscriber-4@example.com", "risk_score": "0.12", "failed_payments": "0", "outstanding_amount": "10.00"},
-]
-
-
-def write_demo_if_missing():
-    if DEMO.exists():
-        return
-    with DEMO.open("w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=DEMO_ROWS[0].keys())
-        writer.writeheader()
-        writer.writerows(DEMO_ROWS)
+DRY_RUN = "--dry-run" in sys.argv
 
 
 def decide(risk, failed):
@@ -48,6 +34,8 @@ def act(email, action, amount):
         return {"status": "logged_only"}
     if email != BUYER:
         return {"status": "logged_only", "note": "not a sandbox account, no PayPal call made"}
+    if DRY_RUN:
+        return {"status": "logged_only", "note": "dry run, no PayPal call made"}
 
     offer = f"{float(amount) * (1 - OFFER_DISCOUNT):.2f}"
     order = api("POST", "/v2/checkout/orders", {
@@ -80,8 +68,9 @@ def log(record):
 
 
 def main():
-    write_demo_if_missing()
-    with DEMO.open() as f:
+    if not SCORED.exists():
+        raise SystemExit("Run python src\\score_subscribers.py first.")
+    with SCORED.open() as f:
         rows = list(csv.DictReader(f))
 
     for row in rows:
@@ -98,6 +87,7 @@ def main():
             "time": datetime.now(timezone.utc).isoformat(),
             "subscriber": row["email"],
             "risk_score": risk,
+            "score_source": "churn_model.joblib",
             "failed_payments": failed,
             "action": action,
             "reason": reason,
