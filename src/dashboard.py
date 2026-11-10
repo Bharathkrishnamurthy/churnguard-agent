@@ -80,7 +80,7 @@ PAGE = """<!doctype html>
   tbody tr:hover { background: #17233d; }
   .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12.5px; color: #c7d2ea; }
   .muted { color: var(--muted); }
-  .subject { max-width: 230px; word-break: break-all; }
+  .subject { max-width: 240px; overflow-wrap: anywhere; }
   .reason { max-width: 260px; color: #c7d2ea; line-height: 1.45; }
   .badge, .pill {
     display: inline-block;
