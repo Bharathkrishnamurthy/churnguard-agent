@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from paypal_client import api
+from explain import explain
 
 DATA = Path("data")
 DATA.mkdir(exist_ok=True)
@@ -91,6 +92,7 @@ def main():
             "failed_payments": failed,
             "action": action,
             "reason": reason,
+            "explanation": explain(risk, failed, action),
             **result,
         }
         log(record)
