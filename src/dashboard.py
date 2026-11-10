@@ -1,10 +1,11 @@
 import html
 import json
+import os
 from pathlib import Path
 
 from flask import Flask
 
-DECISIONS = Path("data") / "decisions.jsonl"
+DECISIONS = Path(os.environ.get("DECISIONS_PATH", "data/decisions.jsonl"))
 app = Flask(__name__)
 
 
@@ -65,7 +66,7 @@ code {{ background: #f3f5f8; padding: 1px 4px; border-radius: 4px; }}
 </style></head>
 <body>
 <h1>ChurnGuard Agent: decisions</h1>
-<p class="sub">Rule-based decisions from data/decisions.jsonl. Read-only.</p>
+<p class="sub">Rule-based decisions from {esc(DECISIONS)}. Read-only.</p>
 <div class="stats">
   <div class="stat"><b>{len(rows)}</b>subscribers</div>
   <div class="stat"><b>{orders}</b>offers created</div>
@@ -78,6 +79,11 @@ code {{ background: #f3f5f8; padding: 1px 4px; border-radius: 4px; }}
 </table>
 <p class="note">Only the sandbox buyer account triggers a PayPal call. Other rows are demo subscribers and are logged only. Offers are unpaid sandbox orders; the approval page is the evidence of the offer.</p>
 </body></html>"""
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}, 200
 
 
 if __name__ == "__main__":
